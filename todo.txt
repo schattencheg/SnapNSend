@@ -1,0 +1,156 @@
+Step 1. Choosing the learning project
+“Act as a senior backend architect.
+Help me design a small but realistic microservices-based learning project using Python, FastAPI, RabbitMQ, Redis, and Docker.
+Requirements for the project idea:
+2–3 clear business use-cases (for example: order processing, notifications, billing, user registration).
+At least one HTTP API service built with FastAPI and one background worker service consuming messages from RabbitMQ.
+Redis should be used either as a cache, as a storage for short‑lived state (like job or order status), or for rate limiting.
+Your tasks:
+Propose 3 different project ideas that match these constraints.
+For each idea, describe:
+What main business flow the project implements (from the user’s perspective).
+Which microservices exist and what their responsibilities are.
+How services communicate (HTTP vs RabbitMQ messages) and what high‑level events/messages they exchange.
+Where Redis fits in and what exactly is stored there.
+Recommend which idea is best suited for a 1–2 week learning project and explain why.”
+
+
+Step 2. Base FastAPI service design
+“Act as a senior Python/FastAPI developer.
+Help me define and scaffold a base FastAPI service for my microservices project.
+Context:
+This will be the main HTTP API service that exposes endpoints to clients.
+It will later publish messages to RabbitMQ and read state from Redis.
+Your tasks:
+Propose a clean project structure using modules and packages. For example:
+app/main.py
+app/api/routes.py
+app/schemas.py
+app/core/config.py
+app/services/ (for business logic)
+Provide concrete code examples for:
+A FastAPI app instance with a /health endpoint.
+At least one domain endpoint (for example /orders with POST and GET) using Pydantic models for request and response.
+A simple dependency‑injection pattern for configuration (reading env vars) and database/clients that will later be added (RabbitMQ, Redis).
+Explain:
+How to run this service in development using uvicorn.
+How to organize settings (development vs production) using environment variables.
+Best practices for separating API layer, schemas, and business logic.”
+
+
+Step 3. Integrating RabbitMQ (publisher + worker)
+“Act as a senior backend engineer experienced with message brokers.
+Help me integrate RabbitMQ into my FastAPI microservices project.
+Context:
+The FastAPI service will publish messages when certain API endpoints are called (for example, when a new order is created).
+A separate worker service (separate process/container) will consume these messages and perform heavy or asynchronous work.
+Your tasks:
+Choose a modern, well‑supported Python client for RabbitMQ and justify the choice briefly.
+Show how to implement a publisher inside the FastAPI service:
+How to create and manage the RabbitMQ connection and channel (including reconnection strategy overview).
+How to declare an exchange/queue if needed.
+How to publish JSON messages with a clear schema (e.g. order ID, status, timestamp).
+How to structure the code (e.g. app/messaging/rabbitmq.py) so it’s reusable and testable.
+Show how to implement a worker service:
+A minimal script that connects to RabbitMQ, subscribes to the given queue, and consumes messages forever.
+How to deserialize message payloads, handle success and failure, and acknowledge or reject messages.
+Where to place business logic (e.g. in a separate services module) so the worker’s main file stays thin.
+Provide conventions and best practices:
+Naming conventions for exchanges, queues, and routing keys.
+How to model message payloads (include fields like IDs, correlation IDs, timestamps).
+How to log message processing and errors in a way that is easy to debug across services.”
+
+
+Step 4. Integrating Redis (status, cache, rate limiting)
+“Act as a senior backend engineer familiar with Redis.
+Help me integrate Redis into my microservices project for status tracking and/or caching.
+Context:
+When a request comes into the FastAPI API, a message is published to RabbitMQ and processed asynchronously by a worker.
+I want to store and query the processing status in Redis (for example: pending, processing, done, failed).
+Your tasks:
+Recommend whether to use a synchronous or asynchronous Redis client in a FastAPI app and briefly explain the trade‑offs.
+Provide code examples for:
+Initializing a Redis client (with proper configuration via environment variables: host, port, DB, password).
+Functions like set_status(order_id: str, status: str) and get_status(order_id: str) with key naming conventions (e.g. order:{id}:status).
+Show how to integrate these functions into both services:
+In the FastAPI service: set initial status (e.g. pending) and expose an endpoint like GET /orders/{order_id}/status that fetches from Redis.
+In the worker service: update status as the job progresses (e.g. set processing when started and done or failed when finished).
+Optionally, describe and give short code snippets for:
+Using Redis for caching expensive reads.
+Implementing a simple rate limiter per user or IP, integrated as a FastAPI dependency.”
+
+
+Step 5. Docker and Docker Compose for the stack
+“Act as a DevOps‑oriented backend engineer.
+Help me containerize my microservices project (FastAPI API service, worker service) and orchestrate it with Docker Compose alongside RabbitMQ and Redis.
+Context:
+I have two Python services: api (FastAPI) and worker (RabbitMQ consumer).
+I also need RabbitMQ (with management UI) and Redis instances.
+Your tasks:
+Provide a production‑ready Dockerfile example for the FastAPI API service, including:
+Appropriate Python base image.
+Installation of dependencies from requirements.txt or pyproject.toml.
+Non‑root user best practices if relevant.
+A recommended command for running the app (for example: gunicorn with uvicorn workers, or at least uvicorn with proper host/port).
+Provide a Dockerfile for the worker service:
+Based on the same or compatible Python image.
+Installing dependencies.
+A clear CMD that runs the worker script that consumes from RabbitMQ.
+Provide a docker-compose.yml file that defines:
+api service (build context, ports, environment variables, dependencies on rabbitmq and redis).
+worker service (build context, environment variables, dependency on rabbitmq and redis).
+rabbitmq service with default ports and enabling the management UI (show how to set default user/password via environment vars).
+redis service with default configuration.
+A shared network so containers can refer to each other by service name (e.g. rabbitmq, redis).
+Explain:
+How the API and worker should refer to rabbitmq and redis hosts inside containers.
+How to use .env files with Docker Compose to keep sensitive settings out of the compose file.
+Basic commands to start, stop, and rebuild the stack for local development.”
+
+
+Step 6. Splitting into multiple microservices
+“Act as a software architect for microservices.
+Help me logically and physically split my project into multiple microservices.
+Context:
+Current state: one FastAPI API service, one worker, RabbitMQ, Redis.
+Domain: [describe my domain here, e.g. ‘order processing and notifications’].
+Your tasks:
+Propose a microservice decomposition for this domain, including:
+Specific service names (for example: orders-service, notifications-service, billing-service, users-service).
+Responsibilities and boundaries of each service (what they own, what they should not know about).
+For each service, describe:
+What HTTP endpoints it exposes (just main ones, not every detail).
+What messages/events it publishes to RabbitMQ and which queues/events it subscribes to.
+How it uses Redis (if at all).
+Suggest a repository and folder structure strategy:
+Whether to use one monorepo or multiple repos.
+How to structure common code (DTOs, shared libs, contracts) to avoid tight coupling.
+Provide guidelines for versioning and evolving contracts:
+How to version HTTP APIs (URL versioning, headers, etc.).
+How to evolve message schemas for RabbitMQ with backward compatibility in mind.
+How to document contracts (e.g. OpenAPI for HTTP and JSON schemas for messages).”
+
+
+Step 7. Practical tips, pitfalls, and improvements
+“Act as a very experienced backend engineer and microservices practitioner.
+Provide a detailed checklist of best practices, common pitfalls, and improvement ideas for a microservices system built with Python, FastAPI, RabbitMQ, Redis, and Docker.
+Your tasks:
+Asynchronous programming:
+When and how to use async endpoints and async clients in FastAPI.
+How to avoid blocking the event loop (e.g. CPU‑bound work, blocking libraries) and what to do instead.
+Reliability and message processing:
+How to design idempotent message handlers to safely retry processing.
+Strategies for handling failures (dead‑letter queues, retry policies, backoff).
+Patterns for ensuring at‑least‑once vs at‑most‑once processing.
+Observability:
+How to implement structured logging across services (including correlation IDs / request IDs to trace a single request through API, RabbitMQ, worker).
+Basic metrics to collect (throughput, latency, error rates, queue lengths) and where to instrument them.
+Configuration and environments:
+How to manage configuration via environment variables and configuration objects.
+How to separate dev/stage/prod configurations.
+How to safely store secrets and connection strings when using Docker and Docker Compose.
+Local development workflow:
+Recommended workflow for developing and debugging services locally with Docker Compose.
+How to hot‑reload code inside containers for faster iteration.
+Tips for debugging issues related to networking, queues, and Redis.
+Any additional design or code‑level recommendations specific to Python + FastAPI + RabbitMQ + Redis + Docker that can help me write cleaner, more maintainable services.”

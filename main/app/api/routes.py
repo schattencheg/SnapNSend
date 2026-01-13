@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from uuid import UUID
-from ..schemas import OrderCreate, OrderUpdate, OrderResponse, HealthCheck
-from ..services.order_service import order_service
+from ..schemas import RequestCreate, RequestUpdate, RequestResponse, HealthCheck
+from ..services.request_service import request_service
 from datetime import datetime
 
 
@@ -15,37 +15,37 @@ async def health_check():
     return HealthCheck(timestamp=datetime.utcnow())
 
 
-@router.post("/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
-async def create_order(order: OrderCreate):
-    """Create a new order"""
-    return await order_service.create_order(order)
+@router.post("/requests", response_model=RequestResponse, status_code=status.HTTP_201_CREATED)
+async def create_request(request: RequestCreate):
+    """Create a new request"""
+    return await request_service.create_request(request)
 
 
-@router.get("/orders/{order_id}", response_model=OrderResponse)
-async def get_order(order_id: UUID):
-    """Get an order by ID"""
-    order = await order_service.get_order(order_id)
-    if not order:
+@router.get("/requests/{request_id}", response_model=RequestResponse)
+async def get_request(request_id: UUID):
+    """Get a request by ID"""
+    request = await request_service.get_request(request_id)
+    if not request:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Order not found"
+            detail="Request not found"
         )
-    return order
+    return request
 
 
-@router.get("/orders", response_model=List[OrderResponse])
-async def list_orders():
-    """List all orders"""
-    return await order_service.list_orders()
+@router.get("/requests", response_model=List[RequestResponse])
+async def list_requests():
+    """List all requests"""
+    return await request_service.list_requests()
 
 
-@router.put("/orders/{order_id}", response_model=OrderResponse)
-async def update_order(order_id: UUID, order_update: OrderUpdate):
-    """Update an existing order"""
-    updated_order = await order_service.update_order(order_id, order_update)
-    if not updated_order:
+@router.put("/requests/{request_id}", response_model=RequestResponse)
+async def update_request(request_id: UUID, request_update: RequestUpdate):
+    """Update an existing request"""
+    updated_request = await request_service.update_request(request_id, request_update)
+    if not updated_request:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Order not found"
+            detail="Request not found"
         )
-    return updated_order
+    return updated_request

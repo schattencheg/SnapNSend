@@ -1,6 +1,6 @@
 # SnapNSend API
 
-A FastAPI-based microservice for order processing with Redis and RabbitMQ integration.
+A FastAPI-based microservice for request processing with Redis and RabbitMQ integration.
 
 ## Project Structure
 
@@ -13,7 +13,7 @@ app/
 ├── core/
 │   └── config.py           # Configuration and settings
 ├── services/
-│   └── order_service.py    # Business logic layer
+│   └── request_service.py    # Business logic layer
 ├── database/
 │   └── dependencies.py     # Dependency injection for external services
 └── utils/                  # Utility functions
@@ -22,7 +22,7 @@ app/
 ## Features
 
 - Health check endpoint
-- Order management (CRUD operations)
+- Request management (CRUD operations)
 - Configuration via environment variables
 - Dependency injection for external services
 - Proper separation of concerns (API, business logic, data models)
@@ -58,10 +58,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 - `GET /` - Root endpoint with service info
 - `GET /v1/health` - Health check
-- `POST /v1/orders` - Create a new order
-- `GET /v1/orders/{id}` - Get an order by ID
-- `GET /v1/orders` - List all orders
-- `PUT /v1/orders/{id}` - Update an order
+- `POST /v1/requests` - Create a new request
+- `GET /v1/requests/{id}` - Get a request by ID
+- `GET /v1/requests` - List all requests
+- `PUT /v1/requests/{id}` - Update a request
 
 ## Development
 
