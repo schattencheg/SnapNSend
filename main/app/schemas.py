@@ -1,33 +1,31 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
-from typing import Optional, List
+from typing import Literal, Optional, List
 from uuid import UUID, uuid4
 
 
-class RequestBase(BaseModel):
-    customer_id: str
-    items: List[dict]
-    total_amount: float
-    status: str = "pending"
+class RegisterRequest(BaseModel):
+    user_name: str
+    user_mail: EmailStr
 
 
-class RequestCreate(RequestBase):
-    pass
+class RegisterResponse(BaseModel):
+    user_id: UUID
+    status: Literal["pending", "done", "error"]
 
 
-class RequestUpdate(BaseModel):
-    status: Optional[str] = None
-    items: Optional[List[dict]] = None
-    total_amount: Optional[float] = None
+class SearchRequest(BaseModel):
+    user: UUID = -1
+    n: int = Field(..., ge=1, le=50)
+    mode: Literal["async", "sync"] = "async"  # async = return immediately, sync = wait
+    prompt: str = Field(..., min_length=1)
 
 
-class RequestResponse(RequestBase):
-    id: UUID
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
+class SearchResponse(BaseModel):
+    request_id: UUID
+    status: Literal["pending", "done", "error"]
+    images: Optional[List[str]] = None
+    error: Optional[str] = None
 
 
 class HealthCheck(BaseModel):

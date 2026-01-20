@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from uuid import UUID
-from ..schemas import RequestCreate, RequestUpdate, RequestResponse, HealthCheck
+from ..schemas import RegisterRequest, RegisterResponse, SearchRequest, SearchResponse, HealthCheck
 from ..services.request_service import request_service
 from datetime import datetime
 
@@ -15,13 +15,13 @@ async def health_check():
     return HealthCheck(timestamp=datetime.utcnow())
 
 
-@router.post("/requests", response_model=RequestResponse, status_code=status.HTTP_201_CREATED)
-async def create_request(request: RequestCreate):
+@router.post("/requests", response_model=SearchResponse, status_code=status.HTTP_201_CREATED)
+async def create_request(request: SearchRequest):
     """Create a new request"""
     return await request_service.create_request(request)
 
 
-@router.get("/requests/{request_id}", response_model=RequestResponse)
+@router.get("/requests/{request_id}", response_model=SearchResponse)
 async def get_request(request_id: UUID):
     """Get a request by ID"""
     request = await request_service.get_request(request_id)
@@ -33,19 +33,19 @@ async def get_request(request_id: UUID):
     return request
 
 
-@router.get("/requests", response_model=List[RequestResponse])
+@router.get("/requests", response_model=List[SearchResponse])
 async def list_requests():
     """List all requests"""
     return await request_service.list_requests()
 
 
-@router.put("/requests/{request_id}", response_model=RequestResponse)
-async def update_request(request_id: UUID, request_update: RequestUpdate):
-    """Update an existing request"""
-    updated_request = await request_service.update_request(request_id, request_update)
-    if not updated_request:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Request not found"
-        )
-    return updated_request
+@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
+async def register(request: RegisterRequest):
+    """Register new user"""
+    return await request_service.register_user(request)
+
+
+@router.post("/request_by_email", response_model=SearchResponse, status_code=status.HTTP_201_CREATED)
+async def create_request_by_email(request: SearchRequest):
+    """Create a new request by email"""
+    return await request_service.create_request(request)

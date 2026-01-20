@@ -5,8 +5,15 @@ echo Sending POST request to the server...
 
 REM Set default values
 set "SERVER_URL=http://127.0.0.1:8000"
-set "ENDPOINT=/v1/requests"
-set "DATA={\"customer_id\": \"-1\", \"data\": {\"key\": \"value\"}}"
+set "ENDPOINT=/requests"  REM Changed to a common endpoint name
+set "DATA={\"message\": \"Hello, Server!\", \"data\": {\"key\": \"value\"}}"
+
+REM Show example
+echo Example: POST to /requests endpoint with sample data
+echo Server URL: !SERVER_URL!
+echo Endpoint: !ENDPOINT!
+echo Sample JSON data: !DATA!
+echo.
 
 REM Get user input for server URL (with default)
 set /p "INPUT_URL=Enter server URL (default: !SERVER_URL!): "
@@ -14,11 +21,12 @@ if not "!INPUT_URL!"=="" set "SERVER_URL=!INPUT_URL!"
 
 REM Get user input for endpoint
 set /p "ENDPOINT=Enter endpoint (default: !ENDPOINT!): "
-if "!ENDPOINT!"=="" set "ENDPOINT=/"
+if "!ENDPOINT!"=="" set "ENDPOINT=/requests"
 
 REM Get user input for JSON data
-set /p "DATA=Enter JSON data (default: !DATA!): "
-if "!DATA!"=="" set "DATA={}"
+echo Enter JSON data (use double quotes and escape them, or press Enter for default):
+set /p "DATA_INPUT="
+if not "!DATA_INPUT!"=="" set "DATA=!DATA_INPUT!"
 
 REM Construct the full URL
 set "FULL_URL=!SERVER_URL!!ENDPOINT!"

@@ -81,3 +81,4 @@ async def root():
         "status": "running",
         "debug": settings.debug
     }
+

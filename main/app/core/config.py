@@ -21,6 +21,12 @@ class BaseSettings(BaseSettings):
     # Message broker settings
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
 
+    # Email/SMTP settings
+    smtp_server: str = "localhost"
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+
     # CORS settings
     allowed_origins: List[str] = ["*"]
 

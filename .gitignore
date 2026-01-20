@@ -1,1 +1,42 @@
 *.pid
+# Byte-code files
+*.pyc
+**/__pycache__/
+##
+.pytest_cache/
+.coverage
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Distributions and packaging
+.egg/
+.eggs/
+*.egg-info/
+*.egg
+dist/
+build/
+wheels/
+*.whl
+
+# Specific IDEs and editors
+.vscode/        # Visual Studio Code
+.idea/          # JetBrains (PyCharm, etc)
+*.swp           # vim
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store       # macOS
+Thumbs.db       # Windows
+
+# Miscellaneous
+*.log
+*.sqlite3
+*.save
+.env            # Environment variable files (can contain sensitive info)
