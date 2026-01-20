@@ -40,3 +40,5 @@ Thumbs.db       # Windows
 *.sqlite3
 *.save
 .env            # Environment variable files (can contain sensitive info)
+
+*.db

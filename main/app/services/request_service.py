@@ -5,6 +5,7 @@ from datetime import datetime
 from ..schemas import SearchRequest, SearchResponse, RegisterRequest, RegisterResponse
 from ..models.user import User
 from ..utils.email_service import email_service
+from ..db.database import DatabaseManager
 
 
 class RequestService:
@@ -18,8 +19,8 @@ class RequestService:
         # In-memory storage for demonstration purposes
         # In production, this would be replaced with a database
         self._requests = {}
-        # Storage for user data
-        self._users: dict[UUID, User] = {}
+        # Initialize database manager for persistent user storage
+        self.db_manager = DatabaseManager()
 
     async def register_user(self, register_request: RegisterRequest) -> RegisterResponse:
         """
@@ -32,12 +33,20 @@ class RequestService:
             RegisterResponse: Contains the user UUID and status
         """
         # Check if user with email already exists
-        if register_request.user_mail in [x.user_mail for x in self._users.values()]:
-            raise ValueError(f"User with email {register_request.user_mail} already exists")
+        if self.db_manager.user_exists_with_email(register_request.user_mail):
+            return RegisterResponse(
+                user_id=UUID(int=0),  # Return a zero UUID to indicate error
+                status="error",
+                error=f"User with email {register_request.user_mail} already exists"
+            )
 
         # Check if user with username already exists
-        if register_request.user_name in [x.user_name for x in self._users.values()]:
-            raise ValueError(f"User with username {register_request.user_name} already exists")
+        if self.db_manager.user_exists_with_username(register_request.user_name):
+            return RegisterResponse(
+                user_id=UUID(int=0),  # Return a zero UUID to indicate error
+                status="error",
+                error=f"User with username {register_request.user_name} already exists"
+            )
 
         user_id = uuid4()
 
@@ -49,8 +58,15 @@ class RequestService:
             created_at=datetime.utcnow()
         )
 
-        # Store user in local DB (simulated with in-memory storage)
-        self._users[user_id] = user
+        # Store user in local DB
+        success = self.db_manager.create_user(user)
+        if not success:
+            # This shouldn't happen if the checks above passed, but just in case
+            return RegisterResponse(
+                user_id=UUID(int=0),  # Return a zero UUID to indicate error
+                status="error",
+                error="Failed to create user in database"
+            )
 
         # Send registration email to the user
         email_sent = await email_service.send_registration_email(
@@ -74,7 +90,8 @@ class RequestService:
 
         # Validate that the user exists if a user ID is provided
         if request_data.user != -1:  # Assuming -1 means no user specified
-            if request_data.user not in self._users:
+            user = self.db_manager.get_user_by_id(str(request_data.user))
+            if not user:
                 raise ValueError(f"User with ID {request_data.user} does not exist")
 
         request = SearchResponse(

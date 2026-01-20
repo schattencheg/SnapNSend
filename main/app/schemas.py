@@ -12,6 +12,7 @@ class RegisterRequest(BaseModel):
 class RegisterResponse(BaseModel):
     user_id: UUID
     status: Literal["pending", "done", "error"]
+    error: Optional[str] = None
 
 
 class SearchRequest(BaseModel):
