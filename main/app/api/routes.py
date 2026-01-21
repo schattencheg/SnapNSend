@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from typing import List
 from uuid import UUID
-from ..schemas import RegisterRequest, RegisterResponse, SearchRequest, SearchResponse, HealthCheck
+from ..schemas import (
+    RegisterRequest, RegisterResponse,
+    SearchRequest, SearchResponse, HealthCheck
+)
 from ..services.request_service import request_service
 from datetime import datetime
 
@@ -15,7 +18,11 @@ async def health_check():
     return HealthCheck(timestamp=datetime.utcnow())
 
 
-@router.post("/requests", response_model=SearchResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/requests",
+    response_model=SearchResponse,
+    status_code=status.HTTP_201_CREATED
+)
 async def create_request(request: SearchRequest):
     """Create a new request"""
     return await request_service.create_request(request)
@@ -39,13 +46,25 @@ async def list_requests():
     return await request_service.list_requests()
 
 
-@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=RegisterResponse)
 async def register(request: RegisterRequest):
     """Register new user"""
-    return await request_service.register_user(request)
+    response = await request_service.register_user(request)
+
+    # Return appropriate status code based on the response status
+    if response.status == "error":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=response.error
+        )
+
+    return response
 
 
-@router.post("/request_by_email", response_model=SearchResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/request_by_email", response_model=SearchResponse,
+    status_code=status.HTTP_201_CREATED
+)
 async def create_request_by_email(request: SearchRequest):
     """Create a new request by email"""
     return await request_service.create_request(request)

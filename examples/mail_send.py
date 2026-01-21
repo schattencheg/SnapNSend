@@ -25,4 +25,3 @@ try:
         print("Письмо успешно отправлено!")
 except Exception as e:
     print(f"Произошла ошибка: {e}")
-

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 from typing import Literal, Optional, List
-from uuid import UUID, uuid4
+from uuid import UUID
 
 
 class RegisterRequest(BaseModel):
@@ -16,9 +16,10 @@ class RegisterResponse(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    user: UUID = -1
+    user: Optional[UUID] = None  # Optional user ID, None means no user specified
     n: int = Field(..., ge=1, le=50)
-    mode: Literal["async", "sync"] = "async"  # async = return immediately, sync = wait
+    mode: Literal["async", "sync"] = "async"  # async = return immediately,
+    # sync = wait
     prompt: str = Field(..., min_length=1)
 
 

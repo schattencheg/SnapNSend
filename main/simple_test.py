@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 # Create a test client
 client = TestClient(app)
 
+
 def test_endpoints():
     print("Testing API endpoints...")
 
@@ -39,10 +40,14 @@ def test_endpoints():
 
     # Test listing requests
     response = client.get("/v1/requests")
-    print(f"List requests: {response.status_code} - {len(response.json())} requests")
+    print(
+        f"List requests: {response.status_code} - "
+        f"{len(response.json())} requests"
+    )
     assert response.status_code == 200
 
     print("All tests passed!")
+
 
 if __name__ == "__main__":
     test_endpoints()

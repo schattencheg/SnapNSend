@@ -42,3 +42,5 @@ Thumbs.db       # Windows
 .env            # Environment variable files (can contain sensitive info)
 
 *.db
+
+*.jpg

@@ -20,7 +20,10 @@ async def lifespan(app: FastAPI):
     This is where you would initialize connections to databases,
     message brokers, etc.
     """
-    logger.info(f"Starting up {settings.app_name} (Environment: {os.getenv('ENVIRONMENT', 'development')})...")
+    logger.info(
+        f"Starting up {settings.app_name} "
+        f"(Environment: {os.getenv('ENVIRONMENT', 'development')})..."
+    )
 
     # Startup logic here
     # - Initialize Redis connection
@@ -81,4 +84,3 @@ async def root():
         "status": "running",
         "debug": settings.debug
     }
-

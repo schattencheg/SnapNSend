@@ -18,7 +18,9 @@
             "module": "uvicorn",
             "args": [
                 "app.main:app",
-                "--reload"
+                "--reload",
+                "--port",
+                "8001"
             ],
             "cwd": "${workspaceFolder}/main",
             "console": "integratedTerminal",

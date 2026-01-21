@@ -1,5 +1,4 @@
 import sqlite3
-import os
 from typing import Optional
 from contextlib import contextmanager
 from ..models.user import User
@@ -14,7 +13,7 @@ class DatabaseManager:
         """Initialize the database and create tables if they don't exist."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            
+
             # Create users table
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS users (
@@ -24,7 +23,7 @@ class DatabaseManager:
                     created_at TEXT NOT NULL
                 )
             ''')
-            
+
             conn.commit()
 
     @contextmanager
@@ -41,24 +40,32 @@ class DatabaseManager:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute('''
-                    INSERT INTO users (id, user_name, user_mail, created_at)
-                    VALUES (?, ?, ?, ?)
-                ''', (str(user.id), user.user_name, user.user_mail, user.created_at.isoformat()))
-                
+                cursor.execute(
+                    '''INSERT INTO users (id, user_name, user_mail, created_at)
+                       VALUES (?, ?, ?, ?)''',
+                    (
+                        str(user.id), user.user_name, user.user_mail,
+                        user.created_at.isoformat()
+                    )
+                )
                 conn.commit()
                 return True
         except sqlite3.IntegrityError:
-            # This occurs if user_name or user_mail already exists (due to UNIQUE constraint)
+            # This occurs if user_name or user_mail already exists
+            # (due to UNIQUE constraint)
             return False
 
     def get_user_by_id(self, user_id: str) -> Optional[User]:
         """Retrieve a user by their ID."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT id, user_name, user_mail, created_at FROM users WHERE id = ?', (user_id,))
+            cursor.execute(
+                '''SELECT id, user_name, user_mail, created_at
+                   FROM users WHERE id = ?''',
+                (user_id,)
+            )
             row = cursor.fetchone()
-            
+
             if row:
                 from datetime import datetime
                 return User(
@@ -73,9 +80,13 @@ class DatabaseManager:
         """Retrieve a user by their username."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT id, user_name, user_mail, created_at FROM users WHERE user_name = ?', (username,))
+            cursor.execute(
+                '''SELECT id, user_name, user_mail, created_at
+                   FROM users WHERE user_name = ?''',
+                (username,)
+            )
             row = cursor.fetchone()
-            
+
             if row:
                 from datetime import datetime
                 return User(
@@ -90,9 +101,13 @@ class DatabaseManager:
         """Retrieve a user by their email."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT id, user_name, user_mail, created_at FROM users WHERE user_mail = ?', (email,))
+            cursor.execute(
+                '''SELECT id, user_name, user_mail, created_at
+                   FROM users WHERE user_mail = ?''',
+                (email,)
+            )
             row = cursor.fetchone()
-            
+
             if row:
                 from datetime import datetime
                 return User(
@@ -107,23 +122,29 @@ class DatabaseManager:
         """Check if a user exists with the given email."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT 1 FROM users WHERE user_mail = ?', (email,))
+            cursor.execute(
+                'SELECT 1 FROM users WHERE user_mail = ?', (email,)
+            )
             return cursor.fetchone() is not None
 
     def user_exists_with_username(self, username: str) -> bool:
         """Check if a user exists with the given username."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT 1 FROM users WHERE user_name = ?', (username,))
+            cursor.execute(
+                'SELECT 1 FROM users WHERE user_name = ?', (username,)
+            )
             return cursor.fetchone() is not None
 
     def get_all_users(self) -> list[User]:
         """Retrieve all users from the database."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT id, user_name, user_mail, created_at FROM users')
+            cursor.execute(
+                'SELECT id, user_name, user_mail, created_at FROM users'
+            )
             rows = cursor.fetchall()
-            
+
             users = []
             for row in rows:
                 from datetime import datetime

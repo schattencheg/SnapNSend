@@ -1,6 +1,5 @@
-from typing import AsyncGenerator
 from contextlib import asynccontextmanager
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 import aioredis
 import aio_pika
 from .core.config import settings
@@ -23,7 +22,9 @@ async def get_rabbitmq_connection():
     """Dependency to get RabbitMQ connection"""
     global _rabbitmq_connection
     if _rabbitmq_connection is None:
-        _rabbitmq_connection = await aio_pika.connect_robust(settings.rabbitmq_url)
+        _rabbitmq_connection = await aio_pika.connect_robust(
+            settings.rabbitmq_url
+        )
     return _rabbitmq_connection
 
 
@@ -35,7 +36,9 @@ async def get_db_session():  # Placeholder for database session
         yield None
     except Exception as e:
         # Handle database session errors
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Database error: {str(e)}"
+        )
 
 
 # Context manager for managing external service lifecycle
@@ -44,12 +47,12 @@ async def lifespan_services(app):
     """Manage the lifecycle of external services"""
     redis_client = None
     rabbitmq_conn = None
-    
+
     try:
         # Initialize services
         redis_client = await get_redis_client()
         rabbitmq_conn = await get_rabbitmq_connection()
-        
+
         yield {"redis": redis_client, "rabbitmq": rabbitmq_conn}
     finally:
         # Cleanup services
