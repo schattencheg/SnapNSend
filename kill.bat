@@ -1,14 +1,17 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Define server port
+set "SERVER_PORT=8080"
+
 echo Listing all processes related to the SnapNSend application...
 
 echo.
-echo === Processes listening on port 8000 ===
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr "LISTENING" ^| findstr :8000') do (
+echo === Processes listening on port !SERVER_PORT! ===
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr "LISTENING" ^| findstr :!SERVER_PORT!') do (
     set "PID=%%a"
     if not "!PID!"=="" if not "!PID!"=="0" (
-        echo Process on port 8000: !PID!
+        echo Process on port !SERVER_PORT!: !PID!
     )
 )
 

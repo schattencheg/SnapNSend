@@ -1,10 +1,14 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo Sending POST request to the server...
+REM Load configuration
+set "PROJECT_DIR=%~dp0"
+set "SERVER_PORT=8080"
+set "SERVER_URL=http://127.0.0.1:!SERVER_PORT!"
+
+echo Sending GET request to the server health endpoint...
 
 REM Set default values
-set "SERVER_URL=http://127.0.0.1:8000"
 set "ENDPOINT=/v1/health"
 set "FULL_URL=!SERVER_URL!!ENDPOINT!"
 set "DATA={}"

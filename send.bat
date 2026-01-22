@@ -1,12 +1,16 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Load configuration
+set "PROJECT_DIR=%~dp0"
+set "SERVER_PORT=8080"
+set "SERVER_URL=http://127.0.0.1:!SERVER_PORT!"
+
 echo Sending POST request to the server...
 
 REM Set default values
-set "SERVER_URL=http://127.0.0.1:8000"
 set "ENDPOINT=/v1/requests"
-set "DATA={\"customer_id\": \"-1\", \"data\": {\"key\": \"value\"}}"
+set "DATA={\"user\": null, \"n\": 1, \"prompt\": \"test search query\", \"mode\": \"sync\"}"
 
 REM Get user input for server URL (with default)
 set /p "INPUT_URL=Enter server URL (default: !SERVER_URL!): "

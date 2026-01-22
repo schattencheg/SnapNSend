@@ -1,13 +1,17 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo Sending POST request to the server...
+REM Load configuration
+set "PROJECT_DIR=%~dp0"
+set "SERVER_PORT=8080"
+set "SERVER_URL=http://127.0.0.1:!SERVER_PORT!"
+
+echo Sending POST request to the server register endpoint...
 
 REM Set default values
-set "SERVER_URL=http://127.0.0.1:8000"
 set "ENDPOINT=/v1/register"
 set "FULL_URL=!SERVER_URL!!ENDPOINT!"
-set "DATA={\"user_name\": \"schattencheg\", \"user_mail\": \"schattencheg@gmail.com\"}"
+set "DATA={\"user_name\": \"test_user\", \"user_mail\": \"test@example.com\"}"
 
 REM Send request using curl
 curl -X POST ^

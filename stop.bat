@@ -3,8 +3,9 @@ setlocal enabledelayedexpansion
 
 echo Stopping uvicorn server...
 
-REM Define project directory
-set "PROJECT_DIR=G:\Work\Repos\stagee_2026_01\SnapNSend"
+REM Define project directory and server port
+set "PROJECT_DIR=%~dp0"
+set "SERVER_PORT=8080"
 
 REM Check if PID file exists
 if not exist "!PROJECT_DIR!\uvicorn.pid" (
@@ -40,11 +41,11 @@ if !ERRORLEVEL! EQU 0 (
 
 :alternative_stop
 REM Alternative method: Kill by port
-echo Looking for processes on port 8000...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :8000') do (
+echo Looking for processes on port !SERVER_PORT!...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr LISTENING ^| findstr :!SERVER_PORT!') do (
     set "PID=%%a"
     if not "!PID!"=="" if not "!PID!"=="0" (
-        echo Found process on port 8000: !PID!
+        echo Found process on port !SERVER_PORT!: !PID!
         taskkill /f /t /pid !PID! 2>nul
         if !ERRORLEVEL! EQU 0 (
             echo Uvicorn server stopped successfully.
@@ -71,26 +72,26 @@ echo.
 echo Waiting for connections to close...
 timeout /t 3 /nobreak >nul
 
-REM Test if localhost:8000 is accessible using curl (if available) or PowerShell
-echo Testing localhost:8000 connectivity...
+REM Test if localhost:SERVER_PORT is accessible using curl (if available) or PowerShell
+echo Testing localhost:!SERVER_PORT! connectivity...
 
 REM Try using curl first (more reliable)
-curl --connect-timeout 3 --max-time 5 http://127.0.0.1:8000 >nul 2>&1
+curl --connect-timeout 3 --max-time 5 http://127.0.0.1:!SERVER_PORT! >nul 2>&1
 set CURL_RESULT=%ERRORLEVEL%
 
 if %CURL_RESULT% EQU 0 (
-    echo WARNING: Server is still accessible at http://127.0.0.1:8000
+    echo WARNING: Server is still accessible at http://127.0.0.1:!SERVER_PORT!
     echo The server may not have stopped completely.
 ) else (
     REM If curl is not available or returns error, try PowerShell
-    powershell -Command "try { $response = Invoke-WebRequest -Uri 'http://127.0.0.1:8000' -TimeoutSec 3 -UseBasicParsing; exit 1 } catch { exit 0 }"
+    powershell -Command "try { $response = Invoke-WebRequest -Uri 'http://127.0.0.1:!SERVER_PORT!' -TimeoutSec 3 -UseBasicParsing; exit 1 } catch { exit 0 }"
     set POWERSHELL_RESULT=!ERRORLEVEL!
-    
+
     if !POWERSHELL_RESULT! EQU 1 (
-        echo WARNING: Server is still accessible at http://127.0.0.1:8000
+        echo WARNING: Server is still accessible at http://127.0.0.1:!SERVER_PORT!
         echo The server may not have stopped completely.
     ) else (
-        echo SUCCESS: Server is no longer accessible at http://127.0.0.1:8000
+        echo SUCCESS: Server is no longer accessible at http://127.0.0.1:!SERVER_PORT!
         echo The server has been successfully stopped.
     )
 )

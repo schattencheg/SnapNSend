@@ -1,15 +1,19 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Load configuration
+set "PROJECT_DIR=%~dp0"
+set "SERVER_PORT=8080"
+set "SERVER_URL=http://127.0.0.1:!SERVER_PORT!"
+
 echo Sending POST request to the server...
 
 REM Set default values
-set "SERVER_URL=http://127.0.0.1:8000"
-set "ENDPOINT=/requests"  REM Changed to a common endpoint name
-set "DATA={\"message\": \"Hello, Server!\", \"data\": {\"key\": \"value\"}}"
+set "ENDPOINT=/v1/requests"  REM Changed to a common endpoint name
+set "DATA={\"user\": null, \"n\": 1, \"prompt\": \"test search query\", \"mode\": \"sync\"}"
 
 REM Show example
-echo Example: POST to /requests endpoint with sample data
+echo Example: POST to /v1/requests endpoint with sample data
 echo Server URL: !SERVER_URL!
 echo Endpoint: !ENDPOINT!
 echo Sample JSON data: !DATA!
@@ -21,7 +25,7 @@ if not "!INPUT_URL!"=="" set "SERVER_URL=!INPUT_URL!"
 
 REM Get user input for endpoint
 set /p "ENDPOINT=Enter endpoint (default: !ENDPOINT!): "
-if "!ENDPOINT!"=="" set "ENDPOINT=/requests"
+if "!ENDPOINT!"=="" set "ENDPOINT=/v1/requests"
 
 REM Get user input for JSON data
 echo Enter JSON data (use double quotes and escape them, or press Enter for default):
