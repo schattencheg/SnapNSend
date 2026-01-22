@@ -54,6 +54,47 @@ class PerplexityImageDownloader:
 
         return downloaded_paths
 
+    async def _create_black_square_image(self, filepath: str, size: int = 224):
+        """
+        Create a black square image and save it to the specified filepath.
+
+        Args:
+            filepath: Path where the image should be saved
+            size: Size of the square image (size x size pixels)
+        """
+        # Import PIL only when needed to avoid requiring it as a dependency if not used elsewhere
+        from PIL import Image
+
+        # Create a black square image
+        img = Image.new('RGB', (size, size), color='black')
+
+        # Save the image
+        img.save(filepath)
+
+    async def search_and_download_images(self, query: str, num_images: int = 10, user_name: str = "default_user", request_id: str = "default_request") -> List[str]:
+        """
+        Search for images based on the query and download them.
+
+        Args:
+            query: The search query for images
+            num_images: Number of images to download (default 10)
+            user_name: Name of the user making the request
+            request_id: ID of the request
+
+        Returns:
+            List of file paths to downloaded images
+        """
+        # Use Perplexity to get search terms or related topics
+        search_terms = await self.get_search_terms_from_perplexity(query)
+
+        # Use search terms to find image URLs
+        image_urls = await self.search_for_image_urls(search_terms, num_images)
+
+        # Download the images
+        downloaded_paths = await self.download_images(image_urls, user_name, request_id)
+
+        return downloaded_paths
+
     async def get_search_terms_from_perplexity(self, query: str) -> List[str]:
         """
         Use Perplexity API to get relevant search terms or topics based on the query.
@@ -211,63 +252,34 @@ class PerplexityImageDownloader:
 
         return image_urls
 
-    async def download_images(self, image_urls: List[str]) -> List[str]:
+    async def download_images(self, image_urls: List[str], user_name: str = "default_user", request_id: str = "default_request") -> List[str]:
         """
         Download images from the provided URLs.
 
         Args:
             image_urls: List of image URLs to download
+            user_name: Name of the user making the request
+            request_id: ID of the request
 
         Returns:
             List of file paths to downloaded images
         """
         downloaded_paths = []
 
-        # Create downloads directory
-        os.makedirs("downloads", exist_ok=True)
+        # Create the folder structure: downloads/user_name/request_id
+        folder_path = os.path.join("downloads", user_name, request_id)
+        os.makedirs(folder_path, exist_ok=True)
 
         for i, url in enumerate(image_urls):
             try:
-                # Determine if this is a real URL or a mock URL
-                is_mock_url = "example-images.com" in url
-
                 # Generate a unique filename based on the URL or index
-                if not is_mock_url:
-                    # For real image URLs, try to preserve the original filename
-                    filename_parts = url.split('/')
-                    original_filename = filename_parts[-1] if filename_parts else f"perplexity_image_{i+1:02d}.jpg"
+                filename = f"black_square_img_{i+1:02d}.jpg"
+                filepath = os.path.join(folder_path, filename)
 
-                    # Ensure it has a proper extension
-                    if not any(original_filename.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']):
-                        original_filename += ".jpg"
+                # Create a black square image instead of downloading the actual image
+                await self._create_black_square_image(filepath)
 
-                    filename = f"perplexity_real_img_{i+1:02d}_{original_filename}"
-                else:
-                    # For mock URLs, use a placeholder filename
-                    filename = f"perplexity_mock_img_{i+1:02d}.jpg"
-
-                filepath = os.path.join("downloads", filename)
-
-                if not is_mock_url:
-                    # Download the actual image
-                    async with self.session.get(url) as response:
-                        if response.status == 200:
-                            with open(filepath, 'wb') as f:
-                                async for chunk in response.content.iter_chunked(8192):
-                                    f.write(chunk)
-
-                            print(f"Downloaded real image {i+1}/{len(image_urls)}: {filename}")
-                        else:
-                            print(f"Failed to download image {i+1} from {url}, status: {response.status}")
-                            # Create a placeholder in case of download failure
-                            with open(filepath, 'w') as f:
-                                f.write(f"Failed to download image from URL: {url}\nStatus: {response.status}\n")
-                else:
-                    # For mock URLs, create a placeholder file
-                    with open(filepath, 'w') as f:
-                        f.write(f"Placeholder for image from URL: {url}\n")
-
-                    print(f"Created placeholder for image {i+1}/{len(image_urls)}: {filename}")
+                print(f"Created black square image {i+1}/{len(image_urls)}: {filepath}")
 
                 downloaded_paths.append(filepath)
 
@@ -275,7 +287,7 @@ class PerplexityImageDownloader:
                 print(f"Error processing image from {url}: {str(e)}")
                 # Create a placeholder file even if there's an error
                 error_filename = f"perplexity_error_img_{i+1:02d}.txt"
-                error_filepath = os.path.join("downloads", error_filename)
+                error_filepath = os.path.join(folder_path, error_filename)
                 with open(error_filepath, 'w') as f:
                     f.write(f"Error downloading image from URL: {url}\nError: {str(e)}\n")
                 downloaded_paths.append(error_filepath)
@@ -286,7 +298,7 @@ class PerplexityImageDownloader:
 # Example usage
 async def main():
     async with PerplexityImageDownloader() as downloader:
-        images = await downloader.search_and_download_images("beautiful landscapes", 10)  # Download 10 images as requested
+        images = await downloader.search_and_download_images("beautiful landscapes", 10, "test_user", "test_request")  # Download 10 images as requested
         print(f"Downloaded {len(images)} images: {images}")
 
 

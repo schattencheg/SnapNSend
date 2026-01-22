@@ -15,7 +15,7 @@ echo Sending POST request to the server register endpoint...
 REM Set default values
 set "ENDPOINT=/v1/register"
 set "FULL_URL=!SERVER_URL!!ENDPOINT!"
-set "DATA={\"user_name\": \"test_user\", \"user_mail\": \"test@example.com\"}"
+set "DATA={\"user_name\": \"schattencheg\", \"user_mail\": \"schattencheg@gmail.com\"}"
 
 REM Send request using curl
 curl -X POST ^

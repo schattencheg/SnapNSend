@@ -14,7 +14,7 @@ echo Sending POST request to the server...
 
 REM Set default values
 set "ENDPOINT=/v1/requests"  REM Changed to a common endpoint name
-set "DATA={\"user\": null, \"n\": 1, \"prompt\": \"test search query\", \"mode\": \"sync\"}"
+set "DATA={\"user\": \"c5d8e386-bce7-40db-9051-90a1aed46045\", \"n\": 1, \"prompt\": \"test search query\", \"mode\": \"sync\"}"
 
 REM Show example
 echo Example: POST to /v1/requests endpoint with sample data

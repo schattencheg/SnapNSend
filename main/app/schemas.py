@@ -25,7 +25,7 @@ class SearchRequest(BaseModel):
 
 class SearchResponse(BaseModel):
     request_id: UUID
-    status: Literal["pending", "done", "error"]
+    status: Literal["pending", "processing", "done", "error"]
     images: Optional[List[str]] = None
     error: Optional[str] = None
 

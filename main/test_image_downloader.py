@@ -9,12 +9,14 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
 
+import pytest
 from app.ai.image_downloader import PerplexityImageDownloader
 from app.services.request_service import request_service
 from app.schemas import SearchRequest
 from uuid import UUID
 
 
+@pytest.mark.asyncio
 async def test_image_downloader():
     """Test the image downloader functionality"""
     print("Testing image downloader...")
@@ -22,7 +24,7 @@ async def test_image_downloader():
     try:
         async with PerplexityImageDownloader() as downloader:
             # Test with a simple query - this will use mock URLs if no API keys are set
-            images = await downloader.search_and_download_images("test query", 3)
+            images = await downloader.search_and_download_images("test query", 3, "test_user", "test_request")
             print(f"Downloaded {len(images)} images: {images}")
             return True
     except Exception as e:
@@ -30,6 +32,7 @@ async def test_image_downloader():
         return False
 
 
+@pytest.mark.asyncio
 async def test_request_service():
     """Test the request service functionality"""
     print("\nTesting request service...")

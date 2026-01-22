@@ -139,7 +139,9 @@ class RequestService:
             async with PerplexityImageDownloader() as image_downloader:
                 image_paths = await image_downloader.search_and_download_images(
                     query=request_data.prompt,
-                    num_images=10  # Request 10 images as specified
+                    num_images=10,  # Request 10 images as specified
+                    user_name=user.user_name,
+                    request_id=str(request_id)
                 )
 
             # Update the request with the downloaded images
