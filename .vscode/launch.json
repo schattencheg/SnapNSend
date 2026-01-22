@@ -20,7 +20,7 @@
                 "app.main:app",
                 "--reload",
                 "--port",
-                "8001"
+                "9000"
             ],
             "cwd": "${workspaceFolder}/main",
             "console": "integratedTerminal",

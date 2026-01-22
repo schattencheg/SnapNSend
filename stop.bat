@@ -5,7 +5,10 @@ echo Stopping uvicorn server...
 
 REM Define project directory and server port
 set "PROJECT_DIR=%~dp0"
-set "SERVER_PORT=8080"
+
+REM Use environment variable for server port, default to 9000 if not set
+set "SERVER_PORT=%SERVER_PORT%"
+if "!SERVER_PORT!"=="" set "SERVER_PORT=9000"
 
 REM Check if PID file exists
 if not exist "!PROJECT_DIR!\uvicorn.pid" (

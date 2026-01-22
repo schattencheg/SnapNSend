@@ -1,8 +1,9 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Define server port
-set "SERVER_PORT=8080"
+REM Use environment variable for server port, default to 9000 if not set
+set "SERVER_PORT=%SERVER_PORT%"
+if "!SERVER_PORT!"=="" set "SERVER_PORT=9000"
 
 echo Listing all processes related to the SnapNSend application...
 

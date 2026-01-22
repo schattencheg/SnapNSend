@@ -5,7 +5,10 @@ REM Store the current directory
 set "PROJECT_DIR=%~dp0"
 set "MAIN_DIR=!PROJECT_DIR!\main"
 set "VENV_DIR=!PROJECT_DIR!\venv"
-set "SERVER_PORT=8080"
+
+REM Use environment variable for server port, default to 9000 if not set
+set "SERVER_PORT=%SERVER_PORT%"
+if "!SERVER_PORT!"=="" set "SERVER_PORT=9000"
 
 REM Activate virtual environment
 if exist "!VENV_DIR!\Scripts\activate.bat" (
