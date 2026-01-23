@@ -1,8 +1,6 @@
 from perplexity import Perplexity
 import os
 
-os.environ["PPLX_API_KEY"] = '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'
-
 client = Perplexity(
     api_key=os.environ["PPLX_API_KEY"],  # or paste your key directly
 )

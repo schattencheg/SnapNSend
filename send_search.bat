@@ -12,11 +12,11 @@ set "SERVER_URL=http://127.0.0.1:!SERVER_PORT!"
 
 echo Sending POST request to the server...
 
-SET "id={}"
+SET "id=c5d8e386-bce7-40db-9051-90a1aed46045"
 
 REM Set default values
 set "ENDPOINT=/v1/requests"
-set "DATA={\"user\": \"id\", \"n\": 1, \"prompt\": \"test search query\", \"mode\": \"sync\"}"
+set "DATA={\"user\": \"!id!\", \"n\": 1, \"prompt\": \"test search query\", \"mode\": \"sync\"}"
 
 REM Get user input for server URL (with default)
 set /p "INPUT_URL=Enter server URL (default: !SERVER_URL!): "
