@@ -3,7 +3,7 @@ import ssl
 
 # Ваши данные
 sender_email = "schattencheg_dev@mail.ru"
-password = "RGblu3K1yL8iKibJf7wE"
+password = ""
 receiver_email = "schattencheg@gmail.com"
 subject = "Тема письма"
 body = "Тело вашего письма на Python"

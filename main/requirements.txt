@@ -1,6 +1,7 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 pydantic
+pydantic[email]
 pydantic-settings
 aioredis==2.0.1
 aio-pika==9.3.0
